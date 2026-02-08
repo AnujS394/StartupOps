@@ -131,6 +131,65 @@ A 24/7 AI advisor that:
 - **Voice Features**: Web Speech (SpeechRecognition & SpeechSynthesis)
 - **State Management**: React hooks (useState, useEffect)
 
+## ⚙️ Setup & Installation
+
+Follow these steps to run the project locally for development or evaluation.
+
+### Prerequisites
+
+Make sure the following are installed:
+- Node.js (v18 or higher recommended)
+- npm or yarn
+- Modern browser (Chrome recommended for voice features)
+
+Check installation:
+node -v  
+npm -v
+
+---
+
+### 1. Clone the Repository
+git clone https://github.com/<AnujS394 
+                                >/startupops-saas-ui.git  
+cd startupops-saas-ui
+
+---
+
+### 2. Install Dependencies
+
+npm install
+or
+yarn install
+
+---
+
+### 3. Run Development Server
+npm run dev
+
+The app will run on:
+
+http://localhost:5173
+
+---
+
+### 4. Production Build
+
+Create optimized production build:
+npm run build
+Preview production build locally:
+npm run preview
+
+---
+
+### Notes
+
+- Voice features require microphone permission.
+- The platform uses demo/mock data.
+- Best viewed on desktop (1440px+ recommended).
+
+---
+
+
 ## 📊 What Makes StartupOps Different
 
 ### 1. Execution Intelligence Over Task Tracking
@@ -215,5 +274,16 @@ This platform demonstrates:
 - Calendar integration (Google, Outlook)
 
 ---
+
+
+## 👥 Team Members
+
+**StartupOps Product Team**
+
+- Anuj Sharma — https://github.com/AnujS394
+- Harshvardhan Singh Bhadoria — 
+- Yuvraj Sikarwar — 
+- [Tanushka Tomar — Research & Product Strategy
+- Khushboo Khator
 
 **Built with ❤️ for founders who execute with intelligence and transparency.**
