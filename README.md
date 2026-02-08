@@ -128,7 +128,7 @@ A 24/7 AI advisor that:
 - **UI Components**: Radix UI primitives
 - **Charts**: Recharts for data visualization
 - **Icons**: Lucide React
-- **Voice Features**: Web Speech API (SpeechRecognition & SpeechSynthesis)
+- **Voice Features**: Web Speech (SpeechRecognition & SpeechSynthesis)
 - **State Management**: React hooks (useState, useEffect)
 
 ## 📊 What Makes StartupOps Different
@@ -209,7 +209,6 @@ This platform demonstrates:
 
 - Real-time collaboration with WebSockets
 - Actual AI integration (OpenAI, Anthropic)
-- Mobile native apps (React Native)
 - Advanced analytics with machine learning
 - Integration with accounting software (QuickBooks, Xero)
 - CRM integration (Salesforce, HubSpot)
@@ -218,14 +217,3 @@ This platform demonstrates:
 ---
 
 **Built with ❤️ for founders who execute with intelligence and transparency.**
-
-  # StartupOps SaaS UI Design
-
-  This is a code bundle for StartupOps SaaS UI Design. The original project is available at https://www.figma.com/design/Nthn9hE2JG0noCOMcjhX9u/StartupOps-SaaS-UI-Design.
-
-  ## Running the code
-
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
