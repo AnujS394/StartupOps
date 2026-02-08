@@ -280,10 +280,8 @@ This platform demonstrates:
 
 **StartupOps Product Team**
 
-- Anuj Sharma — https://github.com/AnujS394
-- Harshvardhan Singh Bhadoria — 
-- Yuvraj Sikarwar — 
-- [Tanushka Tomar — Research & Product Strategy
+- Anuj Sharma
+- Harshvardhan Singh Bhadoria
+- Yuvraj Sikarwar
+- Tanushka Tomar
 - Khushboo Khator
-
-**Built with ❤️ for founders who execute with intelligence and transparency.**
