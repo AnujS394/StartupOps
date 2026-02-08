@@ -2,6 +2,11 @@
 
 A production-ready, desktop-first SaaS platform designed for early-stage startups to manage execution, align funding with outcomes, optimize budgets using AI, predict valuation growth, and build investor trust through transparency.
 
+## Deployed Link
+
+https://startup-ops.vercel.app?_vercel_share=kJ0cUHvYaBqtA6Au24NSKRaoKfEOa2fl
+
+
 ## 🎯 Key Features
 
 ### Core Intelligence Dashboards
