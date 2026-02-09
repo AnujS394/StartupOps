@@ -117,197 +117,155 @@ export function AIChatbot() {
   };
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-      {/* Main Content */}
-      <div className="w-full h-full flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 border-b border-slate-700 bg-slate-800/50 backdrop-blur px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
+    <div className="w-full h-full bg-gradient-to-br from-background via-background to-background/95 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="flex-shrink-0 border-b border-border bg-card/50 backdrop-blur px-8 py-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-r from-primary to-purple-500 rounded-lg">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">AI Co-Founder Assistant</h1>
+            <p className="text-muted-foreground text-sm">Your 24/7 startup advisor & strategic partner</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Chat Container */}
+      <div className="flex-1 flex flex-col overflow-hidden max-w-5xl mx-auto w-full p-6">
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-lg">
+          {/* Chat Header */}
+          <div className="flex-shrink-0 bg-gradient-to-r from-primary/80 to-purple-600/80 px-6 py-4 border-b border-primary/20 flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-white">AI Co-Founder Assistant</h1>
-              <p className="text-slate-400 text-xs">Your 24/7 startup advisor</p>
+              <h2 className="text-white font-bold">Startup Analysis & Strategy</h2>
+              <p className="text-primary-foreground/80 text-xs">Real-time insights powered by 24/7 analysis</p>
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={clearChat}
+              className="text-white hover:bg-white/20"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto bg-card px-6 py-4">
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-2xl px-4 py-3 rounded-lg text-sm ${
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground rounded-br-none'
+                        : `bg-muted ${
+                            message.type === 'warning'
+                              ? 'border border-warning/30'
+                              : message.type === 'recommendation'
+                                ? 'border border-success/30'
+                                : 'border border-border/50'
+                          } rounded-bl-none`
+                    }`}
+                  >
+                    <p className="leading-relaxed whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
+                    <div className="flex items-center justify-between mt-2 gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                      {message.role === 'assistant' && (
+                        <button
+                          onClick={() => copyToClipboard(message.content)}
+                          className="p-1 hover:bg-muted rounded text-xs opacity-50 hover:opacity-100"
+                          title="Copy"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted border border-border/50 text-foreground px-4 py-3 rounded-lg rounded-bl-none flex items-center gap-2 text-sm">
+                    <Loader className="w-4 h-4 animate-spin flex-shrink-0" />
+                    <p>Analyzing your metrics...</p>
+                  </div>
+                </div>
+              )}
+
+              <div ref={scrollRef} />
+            </div>
+          </div>
+
+          {/* Input Area */}
+          <div className="flex-shrink-0 border-t border-border bg-card p-4">
+            <div className="flex gap-2 mb-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !isLoading) {
+                    handleSendMessage();
+                  }
+                }}
+                placeholder="Ask me about your startup, metrics, strategy, risks, or anything else..."
+                className="flex-1 h-10"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={isLoading || !input.trim()}
+                className="px-4 h-10"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Press Enter to send • Try: "Am I ready for Series A?" or "What are my risks?"</p>
           </div>
         </div>
 
-        {/* Main Container - Chat + Sidebar */}
-        <div className="flex-1 flex gap-4 overflow-hidden p-4">
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
-            {/* Chat Header */}
-            <div className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 border-b border-slate-700 flex items-center justify-between">
-              <div>
-                <h2 className="text-white font-bold text-sm">Startup Analysis & Strategy</h2>
-                <p className="text-blue-100 text-xs">Real-time insights powered by 24/7 analysis</p>
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={clearChat}
-                className="text-white hover:bg-white hover:bg-opacity-20 flex-shrink-0"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-            </div>
+        {/* Quick Prompts */}
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {suggestedPrompts.map((prompt, index) => (
+            <button
+              key={index}
+              onClick={() => setInput(prompt)}
+              className="p-3 text-left text-xs font-medium text-foreground bg-muted hover:bg-muted border border-border rounded-lg transition-all hover:shadow-md"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto bg-slate-800 px-4 py-3">
-              <div className="space-y-3">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-sm px-3 py-2 rounded-lg text-sm ${
-                        message.role === 'user'
-                          ? 'bg-blue-600 text-white rounded-br-none'
-                          : `bg-gradient-to-br ${
-                              message.type === 'warning'
-                                ? 'from-amber-900 to-amber-800 text-amber-50'
-                                : message.type === 'recommendation'
-                                  ? 'from-green-900 to-green-800 text-green-50'
-                                  : 'from-slate-700 to-slate-600 text-slate-50'
-                            } rounded-bl-none`
-                      }`}
-                    >
-                      <p className="leading-relaxed whitespace-pre-wrap break-words">
-                        {message.content}
-                      </p>
-                      <div className="flex items-center justify-between mt-1 gap-2">
-                        <p
-                          className={`text-xs ${
-                            message.role === 'user'
-                              ? 'text-blue-100'
-                              : message.type === 'warning'
-                                ? 'text-amber-200'
-                                : message.type === 'recommendation'
-                                  ? 'text-green-200'
-                                  : 'text-slate-400'
-                          }`}
-                        >
-                          {message.timestamp.toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                        {message.role === 'assistant' && (
-                          <button
-                            onClick={() => copyToClipboard(message.content)}
-                            className="p-1 hover:bg-white hover:bg-opacity-10 rounded text-xs"
-                            title="Copy"
-                          >
-                            <Copy className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-gradient-to-br from-slate-700 to-slate-600 text-slate-100 px-3 py-2 rounded-lg rounded-bl-none flex items-center gap-2 text-sm">
-                      <Loader className="w-4 h-4 animate-spin flex-shrink-0" />
-                      <p>Analyzing...</p>
-                    </div>
-                  </div>
-                )}
-
-                <div ref={scrollRef} />
-              </div>
-            </div>
-
-            {/* Input Area */}
-            <div className="flex-shrink-0 border-t border-slate-700 bg-slate-800 p-3">
-              <div className="flex gap-2 mb-2">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && !isLoading) {
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder="Ask about your startup..."
-                  className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400 h-9 text-sm"
-                  disabled={isLoading}
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={isLoading || !input.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 h-9 flex-shrink-0"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-slate-400">Press Enter to send</p>
-            </div>
+        {/* Stats Grid */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <p className="text-xs text-muted-foreground mb-1">Monthly Burn</p>
+            <p className="text-2xl font-bold">$280k</p>
           </div>
-
-          {/* Sidebar */}
-          <div className="w-80 flex flex-col gap-4">
-            {/* Quick Insights Card */}
-            <div className="flex-1 bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-4 flex flex-col overflow-hidden">
-              <h3 className="text-white font-semibold mb-3 text-sm flex items-center gap-2 flex-shrink-0">
-                <Sparkles className="w-4 h-4 text-blue-400" />
-                Quick Insights
-              </h3>
-
-              <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-                {suggestedPrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setInput(prompt)}
-                    className="w-full p-2 text-left text-xs text-slate-100 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors border border-slate-600 hover:border-blue-500"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-
-              {/* Stats */}
-              <div className="border-t border-slate-700 pt-3 flex-shrink-0">
-                <h4 className="text-white text-xs font-semibold mb-2">Your Metrics</h4>
-                <div className="space-y-2">
-                  <div className="bg-slate-700 rounded-lg p-2">
-                    <p className="text-xs text-slate-400">Monthly Burn</p>
-                    <p className="text-base font-bold text-white">$280k</p>
-                  </div>
-                  <div className="bg-slate-700 rounded-lg p-2">
-                    <p className="text-xs text-slate-400">Runway</p>
-                    <p className="text-base font-bold text-white">18.2 mo</p>
-                  </div>
-                  <div className="bg-slate-700 rounded-lg p-2">
-                    <p className="text-xs text-slate-400">Growth Rate</p>
-                    <p className="text-base font-bold text-green-400">23% MoM</p>
-                  </div>
-                  <div className="bg-slate-700 rounded-lg p-2">
-                    <p className="text-xs text-slate-400">NPS Score</p>
-                    <p className="text-base font-bold text-blue-400">68</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Info Cards */}
-            <div className="flex flex-col gap-2">
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-3">
-                <h4 className="text-white font-semibold text-xs mb-1">Real-time Analysis</h4>
-                <p className="text-slate-400 text-xs">AI analyzes metrics for insights.</p>
-              </div>
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-3">
-                <h4 className="text-white font-semibold text-xs mb-1">Strategic Planning</h4>
-                <p className="text-slate-400 text-xs">Data-driven growth recommendations.</p>
-              </div>
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-3">
-                <h4 className="text-white font-semibold text-xs mb-1">24/7 Available</h4>
-                <p className="text-slate-400 text-xs">Always here to help you.</p>
-              </div>
-            </div>
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <p className="text-xs text-muted-foreground mb-1">Runway</p>
+            <p className="text-2xl font-bold">18.2 <span className="text-lg">mo</span></p>
+          </div>
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <p className="text-xs text-muted-foreground mb-1">Growth Rate</p>
+            <p className="text-2xl font-bold text-success">23% MoM</p>
+          </div>
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <p className="text-xs text-muted-foreground mb-1">NPS Score</p>
+            <p className="text-2xl font-bold text-primary">68</p>
           </div>
         </div>
       </div>

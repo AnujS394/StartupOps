@@ -1,8 +1,12 @@
-import { ArrowRight, Sparkles, TrendingDown, DollarSign, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, TrendingDown, DollarSign, Zap, X } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { toast } from 'sonner';
 
 interface BudgetItem {
   category: string;
@@ -27,6 +31,32 @@ const totalOptimized = budgetOptimizations.reduce((sum, item) => sum + item.opti
 const totalSavings = totalCurrent - totalOptimized;
 
 export function BudgetOptimizer() {
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [approvalData, setApprovalData] = useState({
+    approvalEmail: '',
+    implementationTimeline: '30 days',
+    notes: '',
+  });
+
+  const handleApplyRecommendations = () => {
+    setShowApplyModal(true);
+  };
+
+  const handleConfirmApply = () => {
+    if (!approvalData.approvalEmail) {
+      toast.error('Please enter an approval email');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(approvalData.approvalEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    toast.success('Budget optimizations have been applied successfully!');
+    setApprovalData({ approvalEmail: '', implementationTimeline: '30 days', notes: '' });
+    setShowApplyModal(false);
+  };
+
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
       {/* Header */}
@@ -240,7 +270,7 @@ export function BudgetOptimizer() {
             ))}
           </div>
           <Separator className="my-4" />
-          <Button className="w-full">Apply Recommendations</Button>
+          <Button className="w-full" onClick={handleApplyRecommendations}>Apply Recommendations</Button>
         </Card>
       </div>
 
@@ -265,6 +295,78 @@ export function BudgetOptimizer() {
           </div>
         </div>
       </Card>
+
+      {/* Apply Recommendations Modal */}
+      {showApplyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6 bg-card border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Apply Recommendations</h2>
+              <button 
+                onClick={() => setShowApplyModal(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
+              <p className="text-sm">
+                <span className="font-semibold">Estimated Impact:</span> ${(totalSavings * 12 / 1000).toFixed(1)}K annual savings · 18% efficiency gain
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="approval-email">CFO/Manager Email *</Label>
+                <Input 
+                  id="approval-email" 
+                  type="email"
+                  placeholder="cfo@company.com"
+                  value={approvalData.approvalEmail}
+                  onChange={(e) => setApprovalData({ ...approvalData, approvalEmail: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="timeline">Implementation Timeline</Label>
+                <select 
+                  id="timeline"
+                  value={approvalData.implementationTimeline}
+                  onChange={(e) => setApprovalData({ ...approvalData, implementationTimeline: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                >
+                  <option>7 days (Rush)</option>
+                  <option>14 days</option>
+                  <option>30 days</option>
+                  <option>60 days</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="notes">Additional Notes</Label>
+                <textarea 
+                  id="notes"
+                  placeholder="Any special considerations or constraints..."
+                  value={approvalData.notes}
+                  onChange={(e) => setApprovalData({ ...approvalData, notes: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm resize-none h-20"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-4 border-t border-border">
+              <Button variant="outline" className="flex-1" onClick={() => setShowApplyModal(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleConfirmApply}>
+                Apply Changes
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

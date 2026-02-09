@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
 import { ScrollArea } from './ui/scroll-area';
+import { toast } from 'sonner';
 
 interface ChatMessage {
   role: 'assistant' | 'user';
@@ -287,7 +288,9 @@ export function AIAssistant() {
             <div className="border-t border-border pt-4">
               <div className="flex items-center gap-2">
                 {isVoiceMode && (
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" onClick={() => {
+                    toast.success('Recording started');
+                  }}>
                     <Mic className="w-4 h-4" />
                   </Button>
                 )}
@@ -422,7 +425,9 @@ export function AIAssistant() {
                   </Badge>
                   <span className="text-sm font-medium">{rec.action}</span>
                 </div>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={() => {
+                  toast.success(`Implementing: ${rec.action}`);
+                }}>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>

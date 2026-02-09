@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Bell, ChevronDown, Sparkles, Presentation, Zap, LogOut } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { toast } from 'sonner';
 
 interface AppHeaderProps {
   onNavigate: (view: string) => void;
@@ -11,6 +13,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ onNavigate, onLogout, user }: AppHeaderProps) {
+  const [showNotifications, setShowNotifications] = useState(false);
   // Get initials from user name
   const getInitials = (name: string) => {
     return name
@@ -76,7 +79,14 @@ export function AppHeader({ onNavigate, onLogout, user }: AppHeaderProps) {
           <span className="hidden md:inline">Pitch Practice</span>
         </Button>
 
-        <button className="relative p-2 hover:bg-muted/80 rounded-xl transition-all hover:scale-105 group">
+        <button 
+          onClick={() => {
+            setShowNotifications(!showNotifications);
+            if (!showNotifications) {
+              toast.info('Opening Notifications');
+            }
+          }}
+          className="relative p-2 hover:bg-muted/80 rounded-xl transition-all hover:scale-105 group">
           <Bell className="w-5 h-5 group-hover:text-primary transition-colors" />
           <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-gradient-to-br from-destructive to-destructive/80 text-[10px] shadow-md">
             3

@@ -8,6 +8,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { Card3D } from './3DCard';
 import { motion, AnimatePresence } from 'motion/react';
 import { PulseRing } from './InnovativeUI';
+import { toast } from 'sonner';
 
 interface Message {
   role: 'judge' | 'founder' | 'system';
@@ -449,13 +450,19 @@ export function PitchSimulator() {
                   <Button 
                     className="flex-1"
                     disabled={isRecording || isProcessing || !messages.some(m => m.role === 'founder')}
-                    onClick={handleNextQuestion}
+                    onClick={() => {
+                      handleNextQuestion();
+                      toast.info('Loading next question...');
+                    }}
                   >
                     {shouldAskFollowUp ? 'Continue Conversation' : 'Next Question'}
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={handleSkipQuestion}
+                    onClick={() => {
+                      handleSkipQuestion();
+                      toast.info('Question skipped');
+                    }}
                     disabled={isRecording || isProcessing}
                   >
                     Skip
@@ -589,14 +596,23 @@ export function PitchSimulator() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Button className="flex-1" onClick={handleReset}>
+            <Button className="flex-1" onClick={() => {
+              handleReset();
+              toast.success('Starting new practice session...');
+            }}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Practice Again
             </Button>
-            <Button variant="outline" onClick={() => window.print()}>
+            <Button variant="outline" onClick={() => {
+              window.print();
+              toast.success('Generating PDF report...');
+            }}>
               Save Report
             </Button>
-            <Button variant="outline" onClick={() => setShowScore(false)}>
+            <Button variant="outline" onClick={() => {
+              setShowScore(false);
+              toast.info('Reviewing session');
+            }}>
               Review Session
             </Button>
           </div>

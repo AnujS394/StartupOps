@@ -1,11 +1,15 @@
-import { TrendingUp, Users, CheckCircle2, Clock, Target, Zap, Award } from 'lucide-react';
+import { useState } from 'react';
+import { TrendingUp, Users, CheckCircle2, Clock, Target, Zap, Award, X } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card3D, FloatingElement } from './3DCard';
 import { motion } from 'motion/react';
 import { FloatingActionButton, MicroInteractionButton, PulseRing } from './InnovativeUI';
+import { toast } from 'sonner';
 
 const weeklyProgress = [
   { day: 'Mon', completed: 12, planned: 15 },
@@ -25,6 +29,86 @@ const burnData = [
 ];
 
 export function Dashboard() {
+  const [tasks, setTasks] = useState<string[]>([]);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showInviteTeamModal, setShowInviteTeamModal] = useState(false);
+  const [showSetMilestoneModal, setShowSetMilestoneModal] = useState(false);
+  
+  const [taskData, setTaskData] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    assignee: '',
+    priority: 'Medium',
+  });
+
+  const [inviteData, setInviteData] = useState({
+    email: '',
+    role: 'Member',
+  });
+
+  const [milestoneData, setMilestoneData] = useState({
+    title: '',
+    description: '',
+    targetDate: '',
+    category: 'Growth',
+  });
+
+  const handleCreateTask = () => {
+    setShowCreateTaskModal(true);
+  };
+
+  const handleSaveTask = () => {
+    if (!taskData.title || !taskData.dueDate) {
+      toast.error('Please fill in task title and due date');
+      return;
+    }
+    setTasks([...tasks, taskData.title]);
+    toast.success(`Task "${taskData.title}" created successfully!`);
+    setTaskData({ title: '', description: '', dueDate: '', assignee: '', priority: 'Medium' });
+    setShowCreateTaskModal(false);
+  };
+
+  const handleInviteTeam = () => {
+    setShowInviteTeamModal(true);
+  };
+
+  const handleSaveInvite = () => {
+    if (!inviteData.email) {
+      toast.error('Please enter an email address');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inviteData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    toast.success(`Invitation sent to ${inviteData.email}!`);
+    setInviteData({ email: '', role: 'Member' });
+    setShowInviteTeamModal(false);
+  };
+
+  const handleSetMilestone = () => {
+    setShowSetMilestoneModal(true);
+  };
+
+  const handleSaveMilestone = () => {
+    if (!milestoneData.title || !milestoneData.targetDate) {
+      toast.error('Please fill in milestone title and target date');
+      return;
+    }
+    toast.success(`Milestone "${milestoneData.title}" created successfully!`);
+    setMilestoneData({ title: '', description: '', targetDate: '', category: 'Growth' });
+    setShowSetMilestoneModal(false);
+  };
+
+  const handleBudgetAnalysis = () => {
+    toast.loading('Running budget analysis...');
+    setTimeout(() => {
+      toast.success('Budget analysis complete! Check the Budget Optimizer for insights');
+    }, 2000);
+  };
+
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto relative" style={{ perspective: '1000px' }}>
       {/* Floating Action Button */}
@@ -33,25 +117,33 @@ export function Dashboard() {
           {
             icon: <CheckCircle2 className="w-5 h-5" />,
             label: 'Create Task',
-            onClick: () => console.log('Create Task'),
+            onClick: () => {
+              handleCreateTask();
+            },
             color: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
           },
           {
             icon: <Users className="w-5 h-5" />,
             label: 'Invite Team Member',
-            onClick: () => console.log('Invite Team'),
+            onClick: () => {
+              handleInviteTeam();
+            },
             color: 'linear-gradient(135deg, #10b981, #14b8a6)',
           },
           {
             icon: <Target className="w-5 h-5" />,
             label: 'Set Milestone',
-            onClick: () => console.log('Set Milestone'),
+            onClick: () => {
+              handleSetMilestone();
+            },
             color: 'linear-gradient(135deg, #f59e0b, #ef4444)',
           },
           {
             icon: <Zap className="w-5 h-5" />,
             label: 'AI Analysis',
-            onClick: () => console.log('AI Analysis'),
+            onClick: () => {
+              handleBudgetAnalysis();
+            },
             color: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
           },
         ]}
@@ -74,10 +166,14 @@ export function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <MicroInteractionButton variant="ghost">
+          <MicroInteractionButton variant="ghost" onClick={() => {
+            toast.success('Report exported successfully');
+          }}>
             Export Report
           </MicroInteractionButton>
-          <MicroInteractionButton variant="primary">
+          <MicroInteractionButton variant="primary" onClick={() => {
+            toast.success('Investor update scheduled for next week');
+          }}>
             Schedule Investor Update
           </MicroInteractionButton>
         </div>
@@ -284,19 +380,19 @@ export function Dashboard() {
         <Card3D intensity={8} className="p-6 shadow-xl rounded-xl border border-border/50 bg-card/80 backdrop-blur-md">
           <h3 className="mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" onClick={handleCreateTask}>
               <CheckCircle2 className="w-4 h-4 mr-2" />
               Create Task
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" onClick={handleInviteTeam}>
               <Users className="w-4 h-4 mr-2" />
               Invite Team Member
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" onClick={handleSetMilestone}>
               <Target className="w-4 h-4 mr-2" />
               Set Milestone
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" onClick={handleBudgetAnalysis}>
               <Zap className="w-4 h-4 mr-2" />
               Run Budget Analysis
             </Button>
@@ -312,6 +408,225 @@ export function Dashboard() {
           </div>
         </Card3D>
       </div>
+
+      {/* Create Task Modal */}
+      {showCreateTaskModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6 bg-card border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Create Task</h2>
+              <button 
+                onClick={() => setShowCreateTaskModal(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="task-title">Task Title *</Label>
+                <Input 
+                  id="task-title" 
+                  placeholder="e.g., Implement user authentication"
+                  value={taskData.title}
+                  onChange={(e) => setTaskData({ ...taskData, title: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="task-description">Description</Label>
+                <Input 
+                  id="task-description" 
+                  placeholder="Task description (optional)"
+                  value={taskData.description}
+                  onChange={(e) => setTaskData({ ...taskData, description: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="task-due-date">Due Date *</Label>
+                  <Input 
+                    id="task-due-date" 
+                    type="date"
+                    value={taskData.dueDate}
+                    onChange={(e) => setTaskData({ ...taskData, dueDate: e.target.value })}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="task-priority">Priority</Label>
+                  <select 
+                    id="task-priority"
+                    value={taskData.priority}
+                    onChange={(e) => setTaskData({ ...taskData, priority: e.target.value })}
+                    className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                  >
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Urgent</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="task-assignee">Assign To</Label>
+                <Input 
+                  id="task-assignee" 
+                  placeholder="Team member name"
+                  value={taskData.assignee}
+                  onChange={(e) => setTaskData({ ...taskData, assignee: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-4 border-t border-border">
+              <Button variant="outline" className="flex-1" onClick={() => setShowCreateTaskModal(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleSaveTask}>
+                Create Task
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Invite Team Modal */}
+      {showInviteTeamModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6 bg-card border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Invite Team Member</h2>
+              <button 
+                onClick={() => setShowInviteTeamModal(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="invite-email">Email Address *</Label>
+                <Input 
+                  id="invite-email" 
+                  type="email"
+                  placeholder="colleague@company.com"
+                  value={inviteData.email}
+                  onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="invite-role">Role</Label>
+                <select 
+                  id="invite-role"
+                  value={inviteData.role}
+                  onChange={(e) => setInviteData({ ...inviteData, role: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                >
+                  <option>Member</option>
+                  <option>Manager</option>
+                  <option>Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-4 border-t border-border">
+              <Button variant="outline" className="flex-1" onClick={() => setShowInviteTeamModal(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleSaveInvite}>
+                Send Invite
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Set Milestone Modal */}
+      {showSetMilestoneModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6 bg-card border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Set Milestone</h2>
+              <button 
+                onClick={() => setShowSetMilestoneModal(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="milestone-title">Milestone Title *</Label>
+                <Input 
+                  id="milestone-title" 
+                  placeholder="e.g., Launch MVP"
+                  value={milestoneData.title}
+                  onChange={(e) => setMilestoneData({ ...milestoneData, title: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="milestone-description">Description</Label>
+                <Input 
+                  id="milestone-description" 
+                  placeholder="Milestone description (optional)"
+                  value={milestoneData.description}
+                  onChange={(e) => setMilestoneData({ ...milestoneData, description: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="milestone-date">Target Date *</Label>
+                  <Input 
+                    id="milestone-date" 
+                    type="date"
+                    value={milestoneData.targetDate}
+                    onChange={(e) => setMilestoneData({ ...milestoneData, targetDate: e.target.value })}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="milestone-category">Category</Label>
+                  <select 
+                    id="milestone-category"
+                    value={milestoneData.category}
+                    onChange={(e) => setMilestoneData({ ...milestoneData, category: e.target.value })}
+                    className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                  >
+                    <option>Growth</option>
+                    <option>Product</option>
+                    <option>Funding</option>
+                    <option>Team</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-4 border-t border-border">
+              <Button variant="outline" className="flex-1" onClick={() => setShowSetMilestoneModal(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleSaveMilestone}>
+                Create Milestone
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

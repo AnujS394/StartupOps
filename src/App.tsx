@@ -126,8 +126,8 @@ export default function App() {
       {/* Toast Notifications */}
       <Toaster />
 
-      {/* Floating Chatbot Widget */}
-      <FloatingChatbot />
+      {/* Floating Chatbot Widget - Hide on AI Chatbot page */}
+      {currentView !== 'ai-chatbot' && <FloatingChatbot />}
     </div>
   );
 }

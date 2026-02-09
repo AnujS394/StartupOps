@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { User, Bell, Shield, CreditCard, Building2, Users, Save } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -6,8 +7,76 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { Separator } from './ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { toast } from 'sonner';
 
 export function Settings() {
+  const [profileData, setProfileData] = useState({
+    firstName: 'Jane',
+    lastName: 'Doe',
+    email: 'jane@techventure.com',
+    role: 'CEO & Founder',
+  });
+
+  const [companyData, setCompanyData] = useState({
+    companyName: 'TechVenture Inc.',
+    industry: 'SaaS / B2B Software',
+    website: 'https://techventure.com',
+    foundedYear: '2023',
+    teamSize: '24',
+    currentStage: 'Seed',
+    totalRaised: '$12.0M',
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const [notifications, setNotifications] = useState({
+    emailUpdates: true,
+    weeklyReport: true,
+    investorAlerts: true,
+    chatNotifications: false,
+  });
+
+  const handleSaveProfile = () => {
+    if (!profileData.firstName || !profileData.lastName || !profileData.email) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    toast.success('Profile updated successfully!');
+  };
+
+  const handleSaveCompany = () => {
+    if (!companyData.companyName) {
+      toast.error('Company name is required');
+      return;
+    }
+    toast.success('Company information updated successfully!');
+  };
+
+  const handleUpdatePassword = () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      toast.error('Please fill in all password fields');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (passwordData.newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    toast.success('Password updated successfully!');
+    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  };
+
+  const handleNotificationChange = (key: string, value: boolean) => {
+    setNotifications({ ...notifications, [key]: value });
+    toast.success('Notification settings updated');
+  };
   return (
     <div className="p-8 space-y-8 max-w-5xl mx-auto">
       {/* Header */}
@@ -38,27 +107,56 @@ export function Settings() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="Jane" className="mt-1.5" />
+                    <Input 
+                      id="firstName" 
+                      value={profileData.firstName}
+                      onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                      className="mt-1.5" 
+                    />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Doe" className="mt-1.5" />
+                    <Input 
+                      id="lastName" 
+                      value={profileData.lastName}
+                      onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
+                      className="mt-1.5" 
+                    />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="jane@techventure.com" className="mt-1.5" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={profileData.email}
+                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                    className="mt-1.5" 
+                  />
                 </div>
                 <div>
                   <Label htmlFor="role">Role</Label>
-                  <Input id="role" defaultValue="CEO & Founder" className="mt-1.5" />
+                  <Input 
+                    id="role" 
+                    value={profileData.role}
+                    onChange={(e) => setProfileData({ ...profileData, role: e.target.value })}
+                    className="mt-1.5" 
+                  />
                 </div>
               </div>
             </div>
             <Separator className="my-6" />
             <div className="flex justify-end gap-3">
-              <Button variant="outline">Cancel</Button>
-              <Button>
+              <Button variant="outline" onClick={() => {
+                setProfileData({
+                  firstName: 'Jane',
+                  lastName: 'Doe',
+                  email: 'jane@techventure.com',
+                  role: 'CEO & Founder',
+                });
+                toast.info('Changes discarded');
+              }}>Cancel</Button>
+              <Button onClick={handleSaveProfile}>
                 <Save className="w-4 h-4 mr-2" />
                 Save Changes
               </Button>
@@ -70,17 +168,35 @@ export function Settings() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="currentPassword">Current Password</Label>
-                <Input id="currentPassword" type="password" className="mt-1.5" />
+                <Input 
+                  id="currentPassword" 
+                  type="password" 
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div>
                 <Label htmlFor="newPassword">New Password</Label>
-                <Input id="newPassword" type="password" className="mt-1.5" />
+                <Input 
+                  id="newPassword" 
+                  type="password" 
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div>
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <Input id="confirmPassword" type="password" className="mt-1.5" />
+                <Input 
+                  id="confirmPassword" 
+                  type="password" 
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
-              <Button size="sm">Update Password</Button>
+              <Button size="sm" onClick={handleUpdatePassword}>Update Password</Button>
             </div>
           </Card>
         </TabsContent>
@@ -92,31 +208,67 @@ export function Settings() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="companyName">Company Name</Label>
-                <Input id="companyName" defaultValue="TechVenture Inc." className="mt-1.5" />
+                <Input 
+                  id="companyName" 
+                  value={companyData.companyName}
+                  onChange={(e) => setCompanyData({ ...companyData, companyName: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div>
                 <Label htmlFor="industry">Industry</Label>
-                <Input id="industry" defaultValue="SaaS / B2B Software" className="mt-1.5" />
+                <Input 
+                  id="industry" 
+                  value={companyData.industry}
+                  onChange={(e) => setCompanyData({ ...companyData, industry: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div>
                 <Label htmlFor="website">Website</Label>
-                <Input id="website" defaultValue="https://techventure.com" className="mt-1.5" />
+                <Input 
+                  id="website" 
+                  value={companyData.website}
+                  onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="foundedYear">Founded Year</Label>
-                  <Input id="foundedYear" defaultValue="2023" className="mt-1.5" />
+                  <Input 
+                    id="foundedYear" 
+                    value={companyData.foundedYear}
+                    onChange={(e) => setCompanyData({ ...companyData, foundedYear: e.target.value })}
+                    className="mt-1.5" 
+                  />
                 </div>
                 <div>
                   <Label htmlFor="teamSize">Team Size</Label>
-                  <Input id="teamSize" defaultValue="24" className="mt-1.5" />
+                  <Input 
+                    id="teamSize" 
+                    value={companyData.teamSize}
+                    onChange={(e) => setCompanyData({ ...companyData, teamSize: e.target.value })}
+                    className="mt-1.5" 
+                  />
                 </div>
               </div>
             </div>
             <Separator className="my-6" />
             <div className="flex justify-end gap-3">
-              <Button variant="outline">Cancel</Button>
-              <Button>Save Changes</Button>
+              <Button variant="outline" onClick={() => {
+                setCompanyData({
+                  companyName: 'TechVenture Inc.',
+                  industry: 'SaaS / B2B Software',
+                  website: 'https://techventure.com',
+                  foundedYear: '2023',
+                  teamSize: '24',
+                  currentStage: 'Seed',
+                  totalRaised: '$12.0M',
+                });
+                toast.info('Changes discarded');
+              }}>Cancel</Button>
+              <Button onClick={handleSaveCompany}>Save Changes</Button>
             </div>
           </Card>
 
@@ -125,11 +277,21 @@ export function Settings() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="currentStage">Current Stage</Label>
-                <Input id="currentStage" defaultValue="Seed" className="mt-1.5" />
+                <Input 
+                  id="currentStage" 
+                  value={companyData.currentStage}
+                  onChange={(e) => setCompanyData({ ...companyData, currentStage: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
               <div>
                 <Label htmlFor="totalRaised">Total Raised</Label>
-                <Input id="totalRaised" defaultValue="$12.0M" className="mt-1.5" />
+                <Input 
+                  id="totalRaised" 
+                  value={companyData.totalRaised}
+                  onChange={(e) => setCompanyData({ ...companyData, totalRaised: e.target.value })}
+                  className="mt-1.5" 
+                />
               </div>
             </div>
           </Card>
@@ -140,7 +302,9 @@ export function Settings() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3>Team Members</h3>
-              <Button size="sm">
+              <Button size="sm" onClick={() => {
+                toast.success('Invite member dialog opened');
+              }}>
                 <Users className="w-4 h-4 mr-2" />
                 Invite Member
               </Button>
@@ -178,39 +342,54 @@ export function Settings() {
           <Card className="p-6">
             <h3 className="mb-4">Email Notifications</h3>
             <div className="space-y-4">
-              {[
-                { label: 'Task assignments', description: 'Get notified when you are assigned a task' },
-                { label: 'Team updates', description: 'Receive updates about team activities' },
-                { label: 'Funding milestones', description: 'Get alerts for funding-related events' },
-                { label: 'Weekly reports', description: 'Receive weekly performance summaries' },
-                { label: 'AI insights', description: 'Get notified about new AI recommendations' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
-                  <Switch defaultChecked={i < 3} />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Email Updates</p>
+                  <p className="text-xs text-muted-foreground">Receive email updates on important activities</p>
                 </div>
-              ))}
+                <Switch 
+                  checked={notifications.emailUpdates}
+                  onCheckedChange={(value) => handleNotificationChange('emailUpdates', value)}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Weekly Reports</p>
+                  <p className="text-xs text-muted-foreground">Receive weekly performance summaries</p>
+                </div>
+                <Switch 
+                  checked={notifications.weeklyReport}
+                  onCheckedChange={(value) => handleNotificationChange('weeklyReport', value)}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Investor Alerts</p>
+                  <p className="text-xs text-muted-foreground">Get alerts for funding-related events</p>
+                </div>
+                <Switch 
+                  checked={notifications.investorAlerts}
+                  onCheckedChange={(value) => handleNotificationChange('investorAlerts', value)}
+                />
+              </div>
             </div>
           </Card>
 
           <Card className="p-6">
             <h3 className="mb-4">Push Notifications</h3>
             <div className="space-y-4">
-              {[
-                { label: 'Urgent alerts', description: 'Critical notifications that need immediate attention' },
-                { label: 'Mentions', description: 'When someone mentions you in a comment' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
-                  <Switch defaultChecked />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Chat Notifications</p>
+                  <p className="text-xs text-muted-foreground">Get notified about new messages</p>
                 </div>
-              ))}
+                <Switch 
+                  checked={notifications.chatNotifications}
+                  onCheckedChange={(value) => handleNotificationChange('chatNotifications', value)}
+                />
+              </div>
             </div>
           </Card>
         </TabsContent>

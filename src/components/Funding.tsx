@@ -1,10 +1,15 @@
-import { DollarSign, TrendingUp, Calendar, FileText, Plus, Download } from 'lucide-react';
+import { DollarSign, TrendingUp, Calendar, FileText, Plus, Download, X } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Card3D, FloatingElement } from './3DCard';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
+import { generateCapTablePDF } from '../utils/pdfGenerator';
+import { useState } from 'react';
 
 const fundingRounds = [
   {
@@ -46,6 +51,56 @@ const allocationData = [
 ];
 
 export function Funding() {
+  const [isExporting, setIsExporting] = useState(false);
+  const [showPlanRoundModal, setShowPlanRoundModal] = useState(false);
+  const [fundingRoundData, setFundingRoundData] = useState({
+    roundName: '',
+    targetAmount: '',
+    timeline: '',
+    purpose: '',
+    leadInvestor: '',
+  });
+
+  const handleExportCapTable = async () => {
+    setIsExporting(true);
+    toast.loading('Generating cap table PDF...');
+    
+    // Simulate document generation delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      generateCapTablePDF();
+      toast.success('Cap table exported successfully! Check your downloads folder.');
+    } catch (error) {
+      toast.error('Failed to export cap table. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handlePlanNextRound = () => {
+    setShowPlanRoundModal(true);
+  };
+
+  const handleSaveFundingRound = () => {
+    if (!fundingRoundData.roundName || !fundingRoundData.targetAmount || !fundingRoundData.timeline) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Validate amount format
+    const amountValue = parseFloat(fundingRoundData.targetAmount.replace(/[^0-9.]/g, ''));
+    if (isNaN(amountValue) || amountValue <= 0) {
+      toast.error('Please enter a valid funding amount');
+      return;
+    }
+
+    toast.success(
+      `${fundingRoundData.roundName} round ($${amountValue}M) planning initiated! Timeline: ${fundingRoundData.timeline}`
+    );
+    setFundingRoundData({ roundName: '', targetAmount: '', timeline: '', purpose: '', leadInvestor: '' });
+    setShowPlanRoundModal(false);
+  };
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto relative" style={{ perspective: '1000px' }}>
       {/* Floating background elements */}
@@ -65,11 +120,11 @@ export function Funding() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-border/50 hover:border-border">
+          <Button variant="outline" className="border-border/50 hover:border-border" onClick={handleExportCapTable} disabled={isExporting}>
             <Download className="w-4 h-4 mr-2" />
-            Export Cap Table
+            {isExporting ? 'Exporting...' : 'Export Cap Table'}
           </Button>
-          <Button className="bg-gradient-to-r from-primary to-primary shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all">
+          <Button className="bg-gradient-to-r from-primary to-primary shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all" onClick={handlePlanNextRound}>
             <Plus className="w-4 h-4 mr-2" />
             Plan Next Round
           </Button>
@@ -221,7 +276,9 @@ export function Funding() {
                 <p className="font-medium">{round.amount}</p>
                 <p className="text-sm text-muted-foreground">{round.date}</p>
               </div>
-              <Button variant="ghost" size="sm" className="ml-4">
+              <Button variant="ghost" size="sm" className="ml-4" onClick={() => {
+                toast.info(`Viewing documents for ${round.round} round`);
+              }}>
                 <FileText className="w-4 h-4" />
               </Button>
             </motion.div>
@@ -283,6 +340,100 @@ export function Funding() {
           </div>
         </Card3D>
       </div>
+
+      {/* Plan Next Round Modal */}
+      {showPlanRoundModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6 bg-card border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Plan Next Funding Round</h2>
+              <button 
+                onClick={() => setShowPlanRoundModal(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="round-name">Funding Round *</Label>
+                <select 
+                  id="round-name"
+                  value={fundingRoundData.roundName}
+                  onChange={(e) => setFundingRoundData({ ...fundingRoundData, roundName: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                >
+                  <option value="">Select a round...</option>
+                  <option>Series A</option>
+                  <option>Series B</option>
+                  <option>Series C</option>
+                  <option>Bridge Round</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="target-amount">Target Amount (Million $) *</Label>
+                <Input 
+                  id="target-amount" 
+                  placeholder="e.g., 12 or 8.5"
+                  type="text"
+                  value={fundingRoundData.targetAmount}
+                  onChange={(e) => setFundingRoundData({ ...fundingRoundData, targetAmount: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="timeline">Timeline *</Label>
+                <select 
+                  id="timeline"
+                  value={fundingRoundData.timeline}
+                  onChange={(e) => setFundingRoundData({ ...fundingRoundData, timeline: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                >
+                  <option value="">Select timeline...</option>
+                  <option>3 months</option>
+                  <option>6 months</option>
+                  <option>9 months</option>
+                  <option>12 months</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="lead-investor">Lead Investor</Label>
+                <Input 
+                  id="lead-investor" 
+                  placeholder="e.g., Sequoia Capital"
+                  value={fundingRoundData.leadInvestor}
+                  onChange={(e) => setFundingRoundData({ ...fundingRoundData, leadInvestor: e.target.value })}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="purpose">Use of Funds</Label>
+                <textarea 
+                  id="purpose"
+                  placeholder="How will you use the capital? (e.g., Product development, team expansion, market expansion)"
+                  value={fundingRoundData.purpose}
+                  onChange={(e) => setFundingRoundData({ ...fundingRoundData, purpose: e.target.value })}
+                  className="mt-1.5 w-full px-3 py-2 border border-input rounded-md bg-background text-sm resize-none h-20"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6 pt-4 border-t border-border">
+              <Button variant="outline" className="flex-1" onClick={() => setShowPlanRoundModal(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleSaveFundingRound}>
+                Start Planning
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

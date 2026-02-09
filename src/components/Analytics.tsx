@@ -6,6 +6,9 @@ import { TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { Card3D, FloatingElement } from './3DCard';
 import { motion } from 'motion/react';
 import { Chart3DWrapper, ParallaxChart } from './3DChart';
+import { toast } from 'sonner';
+import { generateAnalyticsReportPDF } from '../utils/pdfGenerator';
+import { useState } from 'react';
 
 const revenueData = [
   { month: 'Aug', revenue: 45, costs: 142 },
@@ -34,6 +37,24 @@ const departmentSpend = [
 ];
 
 export function Analytics() {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportReport = async () => {
+    setIsExporting(true);
+    toast.loading('Generating analytics report...');
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      generateAnalyticsReportPDF();
+      toast.success('Analytics report exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export report. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto relative" style={{ perspective: '1000px' }}>
       {/* Floating background elements */}
@@ -51,9 +72,9 @@ export function Analytics() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportReport} disabled={isExporting}>
             <Download className="w-4 h-4 mr-2" />
-            Export Report
+            {isExporting ? 'Exporting...' : 'Export Report'}
           </Button>
         </div>
       </div>

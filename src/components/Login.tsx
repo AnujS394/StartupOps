@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Logo } from './Logo';
+import { toast } from 'sonner';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
@@ -142,6 +143,9 @@ export function Login({ onLogin }: LoginProps) {
               </label>
               <button
                 type="button"
+                onClick={() => {
+                  toast.info('Password reset email sent to your inbox');
+                }}
                 className="text-primary hover:text-primary/80 transition-colors"
               >
                 Forgot password?
@@ -191,7 +195,12 @@ export function Login({ onLogin }: LoginProps) {
           {/* Footer */}
           <div className="p-6 pt-0 text-center text-xs text-muted-foreground">
             Don't have an account?{' '}
-            <button className="text-primary hover:text-primary/80 transition-colors font-medium">
+            <button 
+              type="button"
+              onClick={() => {
+                toast.info('Access request submitted. You will receive an email shortly');
+              }}
+              className="text-primary hover:text-primary/80 transition-colors font-medium">
               Request Access
             </button>
           </div>
